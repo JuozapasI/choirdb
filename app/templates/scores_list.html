@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Psallite Choro Natos{% endblock %}
+
+{% block content %}
+
+{% if scores %}
+<div class="table-container">
+  <table>
+    <thead>
+      <tr><th>Pavadinimas</th><th>Kompozitorius</th><th>Balsų skaičius</th><th>Archyvo ID</th></tr>
+    </thead>
+    <tbody>
+      {% for score in scores %}
+      <tr onclick="window.location='/scores/{{ score.id }}'">
+        <td>
+          {{ score.title }}
+          {% if score.status.name == "PENDING" %}
+          <span style="color: #b5651d; font-style: italic;">(laukia patvirtinimo)</span>
+          {% endif %}
+        </td>
+        <td>{{ score.composer }}</td>
+        <td>{{ score.voices }}</td>
+        <td>{{ score.archive_id }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p>Duombazėje nėra natų.</p>
+{% endif %}
+{% endblock %}
+

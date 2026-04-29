@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="display:block; max-width:600px; margin:0;">
+  <h2 style="margin-top:0; margin-bottom:15px; text-align:left; font-size:1.4em; color:#333;">
+    Laukiantys vartotojų patvirtinimai
+  </h2>
+
+  {% if users %}
+    <ul style="list-style:none; padding-left:0;">
+      {% for user in users %}
+        <li style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #ddd;">
+          <strong>{{ user.username }}</strong>
+          <div style="margin-top:18px;">
+            <form method="post" action="/admin/verify_user/{{ user.id }}" style="display:inline;">
+              <label style="margin-right:10px;">
+                <input type="checkbox" name="make_admin"> Suteikti administratoriaus teises
+              </label>
+              <button type="submit">Patvirtinti</button>
+            </form>
+
+            <form method="post" action="/admin/reject-user/{{ user.id }}" style="display:inline;">
+              <button type="submit" style="background:#f8d7da; color:#721c24; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">
+                Atmesti
+              </button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Nėra laukiančių vartotojų.</p>
+  {% endif %}
+
+  <p style="margin-top:20px;">
+    <a href="/admin/">← Grįžti į administratoriaus pradžios puslapį</a>
+  </p>
+</div>
+{% endblock %}
+

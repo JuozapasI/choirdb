@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Psallite Choro Natos{% endblock %}
+
+{% block content %}
+
+{% if score_sets %}
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Pavadinimas</th>
+        <th>Natų skaičius</th>
+        <th>Informacija</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for set in score_sets %}
+      <tr onclick="window.location='/scores/sets/{{ set.id }}'">
+        <td>{{ set.title }}</td>
+        <td>{{ set.scores|length }}</td>
+        <td>{{ set.info if set.info else "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p>Duombazėje nėra natų rinkinių.</p>
+{% endif %}
+
+{% if user.role.value == "admin" %}
+  <div style="margin-top: 20px; text-align: left;">
+    <a href="/scores/sets/add" 
+       style="display: inline-block; padding: 6px 12px; border-radius: 6px; background: rgba(255, 255, 255, 0.9); color: blue; text-decoration: none;">
+       Pridėti naują rinkinį
+    </a>
+  </div>
+{% endif %}
+
+{% endblock %}
+

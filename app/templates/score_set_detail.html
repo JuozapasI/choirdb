@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="page-title">{{ title or "Natų sąrašas" }}</h1>
+
+<!-- General Info -->
+<div class="content">
+  <div class="card">
+    <h2>Informacija</h2>
+    <div class="fields">
+      <p>{{ info or "" }}</p>
+    </div>
+  </div>
+
+  <!-- Scores Table -->
+  <div class="card">
+    <h2>Natų sąrašas</h2>
+    {% if scores %}
+      <table class="scores-table" style="width:100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left; border-bottom:1px solid #ccc; padding:5px;">Pavadinimas</th>
+            <th style="text-align:left; border-bottom:1px solid #ccc; padding:5px;">Kompozitorius</th>
+            <th style="text-align:left; border-bottom:1px solid #ccc; padding:5px;">Balsų skaičius</th>
+            <th style="text-align:left; border-bottom:1px solid #ccc; padding:5px;">Kalba</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for score in scores|sort(attribute='title') %}
+          <tr onclick="window.location='/scores/{{ score.id }}'" style="cursor:pointer;">
+            <td>{{ score.title }}</td>
+            <td>{{ score.composer | default('') }}</td>
+            <td>{{ score.voices | default('') }}</td>
+            <td>{{ score.language | default('') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Nėra natų.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <a href="/scores/sets" class="back-link">← Atgal</a>
+    {% if user.role.value == "admin"%}
+      <a href="/admin/sets/update/{{ set.id }}">Redaguoti</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

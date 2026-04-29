@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+jinja2
+python-multipart
+pydantic>=2.0
+aiofiles
+alembic
+python-jose[cryptography]
+passlib
+gunicorn
+psycopg2-binary

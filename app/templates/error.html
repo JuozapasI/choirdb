@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="display:block; max-width:400px; padding:20px; margin:40px auto; border:1px solid #ccc; border-radius:8px;">
+  <h2 style="margin-top:0; margin-bottom:15px; text-align:left; font-size:1.4em; color:#333;">
+    Klaida {{ status_code }}
+  </h2>
+
+  {% if detail %}
+    <p style="color:red; margin-bottom:10px;">{{ detail }}</p>
+  {% else %}
+    <p style="color:red; margin-bottom:10px;">Įvyko nežinoma klaida.</p>
+  {% endif %}
+
+  <div style="margin-top:20px;">
+    <a href="/" style="text-decoration:none; color:#007bff;">Grįžti į pradžią</a>
+  </div>
+</div>
+{% endblock %}
+

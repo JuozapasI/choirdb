@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Psallite Choro Natos{% endblock %}
+
+{% block content %}
+<div class="search-bar">
+  <div class="search-box" style="display:flex; gap:10px; align-items:center; padding:10px;">
+    <!-- Search form -->
+    <form action="/" method="get" style="flex-grow:1; display:flex; gap:10px;">
+      <input type="text" name="q" placeholder="Paieška visur..." value="{{ request.query_params.get('q', '') }}">
+      <button type="submit">Ieškoti</button>
+    </form>
+
+    <!-- Advanced search link aligned to right of search form -->
+    <div class="advanced-link">
+      <a href="/scores/search">Išplėstinė paieška</a>
+    </div>
+  </div>
+</div>
+
+{% if scores %}
+<div class="table-container">
+  <table>
+    <thead>
+      <tr><th>Pavadinimas</th><th>Kompozitorius</th><th>Balsų skaičius</th></tr>
+    </thead>
+    <tbody>
+      {% for score in scores %}
+      <tr onclick="window.location='/scores/{{ score.id }}'">
+        <td>
+          {{ score.title }}
+          {% if score.status.name == "PENDING" %}
+          <span style="color: #b5651d; font-style: italic;">(laukia patvirtinimo)</span>
+          {% endif %}
+        </td>
+        <td>{{ score.composer }}</td>
+        <td>{{ score.voices }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p>Duombazėje nėra natų.</p>
+{% endif %}
+{% endblock %}
+

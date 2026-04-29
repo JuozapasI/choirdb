@@ -1,0 +1,204 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* important for consistent sizing */
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url('/static/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Top panel row */
+.top-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.top-panel h1 { margin: 0; font-size: 1.8em; color: #333; }
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 5px;
+    background-color: #eaeaea;
+    transition: background 0.2s;
+}
+nav a:hover { background-color: #d5d5d5; }
+.user-info { font-size: 0.9em; color: #555; }
+
+/* Overlay */
+.overlay { padding: 20px; }
+
+/* Common boxes */
+h1.page-title {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+form {
+    max-width: 800px;
+    margin: 20px auto;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+fieldset {
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fafafa;
+}
+
+legend { font-weight: bold; }
+
+.row { margin-bottom: 10px; }
+
+.lyrics .row { display: flex; gap: 8px; align-items: center; }
+.lyrics input[type="text"] { width: 160px; }
+
+button, input[type="submit"] {
+    margin-top: 5px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+button:hover, input[type="submit"]:hover { background: #45a049; }
+
+/* Table box */
+.table-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+th { background-color: #f2f2f2; }
+tr:hover { background-color: #f9f9f9; }
+tr { cursor: pointer; }
+
+/* Search box */
+.search-bar { margin-bottom: 20px; max-width: 500px; }
+.search-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.search-box input[type="text"] {
+    padding: 6px;
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.search-box button {
+    padding: 6px 12px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.search-box button:hover { background-color: #45a049; }
+.advanced-link { margin-left: auto; font-size: 0.9em; }
+.advanced-link a {
+    text-decoration: none;
+    color: #333;
+    background-color: #eaeaea;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+.advanced-link a:hover { background-color: #d5d5d5; }
+
+/* Page content wrapper */
+.content {
+    max-width: 800px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Card style for sections */
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 40px;
+}
+
+/* Preview box (PDF / lyrics) */
+.preview {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+/* Toggle button */
+.toggle-btn {
+    margin-left: 10px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 5px;
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+.toggle-btn:hover {
+    background: #45a049;
+}
+
+.fields {
+    row-gap: 6px;
+}
+
+.field {
+    margin-bottom: 8px;
+}
+
+.label {
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.value {
+    color: #444;
+}

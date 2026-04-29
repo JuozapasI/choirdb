@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Sukurti naują natų rinkinį{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Naujo natų rinkinio kūrimas</h1>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<form method="post" class="form-box">
+    <div class="row">
+        <label>Pavadinimas* <input type="text" name="title" required></label>
+    </div>
+    <div class="row">
+      <label>Informacija<br>
+        <textarea name="info" rows="4" cols="60"></textarea>
+      </label>
+    </div>
+
+    <fieldset>
+        <legend>Pridėti natų į rinkinį</legend>
+        <input type="text" id="score-search" placeholder="Ieškoti kūrinių...">
+        <div id="search-results"></div>
+        <ul id="selected-scores"></ul>
+    </fieldset>
+
+    <div class="row">
+        <input type="submit" value="Sukurti rinkinį" class="btn-primary">
+        <a href="/scores/sets" class="btn-cancel">Atšaukti</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function searchScores(query) {
+    if (!query) {
+        document.getElementById("search-results").innerHTML = "";
+        return;
+    }
+    const resp = await fetch(`/scores/search_light?q=${encodeURIComponent(query)}`);
+    const scores = await resp.json();
+    const results = document.getElementById("search-results");
+    results.innerHTML = "";
+    scores.forEach(s => {
+        const div = document.createElement("div");
+        div.textContent = `${s.title}${s.composer ? " — " + s.composer : ""}`;
+        div.style.cursor = "pointer";
+        div.onclick = () => addScore(s);
+        results.appendChild(div);
+    });
+}
+
+function addScore(score) {
+    const list = document.getElementById("selected-scores");
+    const li = document.createElement("li");
+    li.textContent = `${score.title}${score.composer ? " — " + score.composer : ""}`;
+    li.innerHTML += ` <button type="button" onclick="this.parentElement.remove()">Pašalinti</button>`;
+    li.innerHTML += `<input type="hidden" name="score_ids" value="${score.id}">`;
+    list.appendChild(li);
+    document.getElementById("search-results").innerHTML = "";
+    document.getElementById("score-search").value = "";
+}
+
+document.getElementById("score-search")
+    .addEventListener("input", e => searchScores(e.target.value));
+</script>
+{% endblock %}
+

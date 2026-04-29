@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Redaguoti natų rinkinį{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Redaguoti natų rinkinį: {{ score_set.title }}</h1>
+
+<form method="post" class="form-box">
+
+  <!-- Metadata -->
+  <div class="card">
+    <h2>Informacija</h2>
+    <div class="fields">
+      <div class="field">
+        <label>Pavadinimas: <input type="text" name="title" value="{{ score_set.title }}"></label>
+      </div>
+      <div class="field">
+        <label>Informacija:<br>
+          <textarea name="info" rows="6" cols="60" style="width:100%; height:100px;">{{ score_set.info or "" }}</textarea>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Existing Scores -->
+  <div class="card">
+    <h2>Natų sąrašas</h2>
+    {% if score_set.scores %}
+      <ul id="existing-scores">
+        {% for score in score_set.scores %}
+          <li style="display: flex; justify-content: space-between; align-items: center;">
+            <span>{{ score.title }}{% if score.composer %} — {{ score.composer }}{% endif %}</span>
+            <label style="width: 120px; text-align: right;">
+              Pašalinti <input type="checkbox" name="delete_scores" value="{{ score.id }}">
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nėra natų šiame rinkinyje.</p>
+    {% endif %}
+  </div>
+
+  <!-- Add new scores -->
+  <div class="card" style="display:block;">
+    <h2>Pridėti naujus kūrinius</h2>
+    <input type="text" id="score-search" placeholder="Ieškoti kūrinių...">
+    <div id="search-results"></div>
+    <ul id="selected-scores"></ul>
+  </div>
+
+  <!-- Actions -->
+  <div class="card">
+    <div class="row">
+      <button type="submit" name="action" value="save">💾 Išsaugoti</button>
+      <button type="submit" name="action" value="delete" onclick="return confirm('Ar tikrai norite ištrinti šį rinkinį?');">🗑 Ištrinti</button>
+      <a href="/scores/sets">← Atšaukti</a>
+    </div>
+  </div>
+
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function searchScores(query) {
+    if (!query) {
+        document.getElementById("search-results").innerHTML = "";
+        return;
+    }
+    const resp = await fetch(`/scores/search_light?q=${encodeURIComponent(query)}`);
+    const scores = await resp.json();
+    const results = document.getElementById("search-results");
+    results.innerHTML = "";
+    scores.forEach(s => {
+        const div = document.createElement("div");
+        div.textContent = `${s.title}${s.composer ? " — " + s.composer : ""}`;
+        div.style.cursor = "pointer";
+        div.onclick = () => addScore(s);
+        results.appendChild(div);
+    });
+}
+
+function addScore(score) {
+    const list = document.getElementById("selected-scores");
+    const li = document.createElement("li");
+    li.textContent = `${score.title}${score.composer ? " — " + score.composer : ""}`;
+    li.innerHTML += ` <button type="button" onclick="this.parentElement.remove()">Pašalinti</button>`;
+    li.innerHTML += `<input type="hidden" name="new_scores" value="${score.id}">`;
+    list.appendChild(li);
+    document.getElementById("search-results").innerHTML = "";
+    document.getElementById("score-search").value = "";
+}
+
+document.getElementById("score-search")
+    .addEventListener("input", e => searchScores(e.target.value));
+</script>
+{% endblock %}
+

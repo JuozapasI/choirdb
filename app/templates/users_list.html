@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="display:block; max-width:800px; margin:0;">
+  <h2 style="margin-top:0; margin-bottom:15px; text-align:left; font-size:1.4em; color:#333;">
+    Registruoti vartotojai
+  </h2>
+
+  {% if users %}
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Vartotojo vardas</th>
+            <th>Patvirtintas</th>
+            <th>Rolė</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ "Taip" if user.is_verified else "Ne" }}</td>
+            <td>{{ user.role.value }}</td>
+            <td>
+            {% if user.role.value != "admin" %}
+            <form method="post" action="/admin/delete-user/{{ user.id }}" style="display:inline;" 
+                  onsubmit="return confirm('Ar tikrai norite ištrinti šį vartotoją?');">
+                <button type="submit" style="color:red;">Ištrinti</button>
+            </form>
+            {% else %}
+            <em>Nepanaikinti</em>
+            {% endif %}
+        </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>Nėra registruotų vartotojų.</p>
+  {% endif %}
+
+  <p style="margin-top:20px;">
+    <a href="/admin/">← Grįžti į administratoriaus pradžios puslapį</a>
+  </p>
+</div>
+{% endblock %}
+

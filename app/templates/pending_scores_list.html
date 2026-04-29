@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="display:block; max-width:800px; margin:0;">
+  <h2 style="margin-top:0; margin-bottom:15px; text-align:left; font-size:1.4em; color:#333;">
+    Nepatvirtinti kūriniai
+  </h2>
+
+  {% if scores %}
+    <ul style="list-style:none; padding:0; margin:0;">
+      {% for s in scores %}
+        <li style="margin-bottom:8px;">
+          <a href="/admin/pending-scores/{{ s.id }}" style="color:#0056b3; text-decoration:none;">
+            {{ s.title }}{% if s.composer %} — {{ s.composer }}{% endif %} – pateikė {{ s.submitted_by_username }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Nėra nepatvirtintų kūrinių.</p>
+  {% endif %}
+
+  <p style="margin-top:20px;">
+    <a href="/admin/">← Grįžti į administratoriaus pradžios puslapį</a>
+  </p>
+</div>
+{% endblock %}
+

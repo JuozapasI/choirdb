@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Kūrinio redagavimas: {{ score.title }}</h1>
+
+<form method="post" action="/admin/update/{{ score.id }}" enctype="multipart/form-data" class="form-box">
+
+  <!-- Metadata -->
+  <div class="card">
+    <h2>Informacija</h2>
+    <div class="fields">
+      <div class="field"><label>Pavadinimas: <input type="text" name="title" value="{{ score.title }}"></label></div>
+      <div class="field"><label>Kompozitorius: <input type="text" name="composer" value="{{ score.composer }}"></label></div>
+      <div class="field"><label>Teksto autorius: <input type="text" name="lyrics_author" value="{{ score.lyrics_author }}"></label></div>
+      <div class="field"><label>Metai: <input type="text" name="year" value="{{ score.year }}"></label></div>
+      <div class="field"><label>Balsų skaičius: <input type="number" name="voices" value="{{ score.voices }}"></label></div>
+      <div class="field"><label>Šaltinis: <input type="text" name="source" value="{{ score.source }}"></label></div>
+      <div class="field"><label>Liturginis laikas: <input type="text" name="liturgical_time" value="{{ score.liturgical_time }}"></label></div>
+      <div class="field"><label>Mišių dalis: <input type="text" name="mass_part" value="{{ score.mass_part }}"></label></div>
+      <div class="field"><label>Natų rinkinys: <input type="text" name="parent_issue" value="{{ score.parent_issue }}"></label></div>
+      <div class="field"><label>Žymos: <input type="text" name="tags" value="{{ score.tags }}"></label></div>
+      <div class="field"><label>Kalba: <input type="text" name="language" value="{{ score.language }}"></label></div>
+      <div class="field"><label>Archyvo ID: <input type="text" name="archive_id" value="{{ score.archive_id }}"></label></div>
+      <div class="field">
+        <label>Papildoma informacija:</label><br>
+        <textarea name="additional_info" rows="8" cols="60" style="width:100%; height:150px;">{{ score.additional_info }}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDFs -->
+  <div class="card" style="display:block;">
+    <h2>PDF failai</h2>
+    {% if score.pdfs %}
+      <ul style="list-style:none; padding:0;">
+        {% for pdf in score.pdfs %}
+          <li style="margin-bottom:20px; margin-top:20px">
+            <a href="/uploads/pdfs/{{ pdf.pdf_path }}" target="_blank">{{ pdf.pdf_path }}</a>
+            <label style="margin-left:10px;">
+              <input type="checkbox" name="delete_pdfs" value="{{ pdf.id }}"> Ištrinti
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="margin: 20px 0;">Nėra PDF failų.</p>
+    {% endif %}
+
+    <fieldset>
+      <legend>Pridėti naują PDF</legend>
+      <div id="pdf-rows">
+        <div class="row">
+          <input type="file" name="new_pdfs" accept="application/pdf">
+          <button type="button" onclick="removeRow(this)">Pašalinti</button>
+        </div>
+      </div>
+      <button type="button" onclick="addPdfRow()">+ Pridėti kitą PDF</button>
+    </fieldset>
+  </div>
+
+  <!-- Lyrics -->
+  <div class="card" style="display:block;">
+    <h2>Tekstas</h2>
+    {% if score.lyrics %}
+      <ul style="list-style:none; padding:0;">
+        {% for lyr in score.lyrics %}
+          <li style="margin-bottom:20px; margin-top:20px">
+            <input type="text" name="update_lyrics_languages_{{ lyr.id }}" value="{{ lyr.language }}">
+            <a href="/uploads/lyrics/{{ lyr.file_path }}" target="_blank">{{ lyr.file_path }}</a>
+            <label style="margin-left:10px;"><input type="checkbox" name="delete_lyrics" value="{{ lyr.id }}"> Ištrinti</label>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="margin: 20px 0;">Nėra teksto failų.</p>
+    {% endif %}
+
+    <fieldset class="lyrics">
+      <legend>Pridėti naują teksto failą</legend>
+      <div id="trans-rows">
+        <div class="row">
+          <input type="text" name="new_lyrics_languages" placeholder="Kalba (pvz., LT)">
+          <input type="file" name="new_lyrics_files" accept=".txt,text/plain" onchange="toggleRequired(this)">
+          <button type="button" onclick="removeRow(this)">Pašalinti</button>
+        </div>
+      </div>
+      <button type="button" onclick="addRow()">+ Pridėti kitą vertimą</button>
+    </fieldset>
+  </div>
+
+  <!-- Related Scores -->
+  <div class="card" style="display:block;">
+    <h2>Susiję kūriniai</h2>
+
+  <!-- Existing related scores -->
+  {% if score.related_scores %}
+    <ul id="existing-related">
+      {% for rel in score.related_scores %}
+        <li style="margin-bottom:20px; margin-top:20px;">
+          {{ rel.title }}{% if rel.composer %} — {{ rel.composer }}{% endif %}
+          <label style="margin-left: 10px; cursor: pointer;">
+            Pašalinti
+            <input type="checkbox" name="delete_related_scores" value="{{ rel.id }}" style="margin-left:5px;">
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="margin: 20px 0;">Nėra susijusių kūrinių.</p>
+  {% endif %}
+
+
+    <!-- Add new related scores -->
+    <input type="text" id="related-search" placeholder="Ieškoti kūrinių...">
+    <div id="search-results"></div>
+    <ul id="selected-related">
+      <!-- Newly added via search will go here -->
+    </ul>
+  </div>
+
+  <!-- Actions -->
+  <div class="card">
+    <div class="row">
+      <button type="submit" name="action" value="save">💾 Išsaugoti</button>
+      <button type="submit" name="action" value="delete" onclick="return confirm('Ar tikrai norite ištrinti šį kūrinį?');">🗑 Ištrinti</button>
+      <a href="/scores/{{ score.id }}">← Atšaukti</a>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function addRow() {
+    const wrap = document.getElementById('trans-rows');
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input type="text" name="new_lyrics_languages" placeholder="Kalba (pvz., LT)">
+      <input type="file" name="new_lyrics_files" accept=".txt,text/plain" onchange="toggleRequired(this)">
+      <button type="button" onclick="removeRow(this)">Pašalinti</button>
+    `;
+    wrap.appendChild(row);
+  }
+
+  function addPdfRow() {
+    const wrap = document.getElementById('pdf-rows');
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input type="file" name="new_pdfs" accept="application/pdf">
+      <button type="button" onclick="removeRow(this)">Pašalinti</button>
+    `;
+    wrap.appendChild(row);
+  }
+
+  function removeRow(btn) {
+    btn.parentElement.remove();
+  }
+
+  function toggleRequired(fileInput) {
+    const row = fileInput.closest(".row");
+    const langInput = row.querySelector('input[name="lyrics_languages"]');
+    langInput.required = fileInput.files.length > 0;
+  }
+
+  async function searchScores(query) {
+    if (!query) {
+      document.getElementById("search-results").innerHTML = "";
+      return;
+    }
+    const resp = await fetch(`/scores/search_light?q=${encodeURIComponent(query)}`);
+    const scores = await resp.json();
+    const results = document.getElementById("search-results");
+    results.innerHTML = "";
+    scores.forEach(s => {
+      const div = document.createElement("div");
+      div.textContent = `${s.title}${s.composer ? " — " + s.composer : ""}${s.voices ? " (balsų: " + s.voices + ")" : ""}`;
+      div.style.cursor = "pointer";
+      div.onclick = () => addRelated(s);
+      results.appendChild(div);
+    });
+  }
+
+  function addRelated(score) {
+    const list = document.getElementById("selected-related");
+    const li = document.createElement("li");
+    li.textContent = `${score.title}${score.composer ? " — " + score.composer : ""}`;
+    li.innerHTML += ` <button type="button" onclick="this.parentElement.remove()">Pašalinti</button>`;
+    li.innerHTML += `<input type="hidden" name="related_scores" value="${score.id}">`;
+    list.appendChild(li);
+    document.getElementById("search-results").innerHTML = "";
+    document.getElementById("related-search").value = "";
+  }
+
+  document.getElementById("related-search")
+    .addEventListener("input", e => searchScores(e.target.value));
+</script>
+{% endblock %}
+

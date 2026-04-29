@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1 class="page-title">{{ score.title }}</h1>
+  
+  <!-- Metadata -->
+  <div class="content">
+  <div class="card">
+    <h2>Informacija</h2>
+    <div class="fields">
+      <div class="field"><span class="label">Kompozitorius:</span> <span class="value">{{ score.composer }}</span></div>
+      <div class="field"><span class="label">Teksto autorius:</span> <span class="value">{{ score.lyrics_author }}</span></div>
+      <div class="field"><span class="label">Metai:</span> <span class="value">{{ score.year }}</span></div>
+      <div class="field"><span class="label">Balsų skaičius:</span> <span class="value">{{ score.voices }}</span></div>
+      <div class="field"><span class="label">Šaltinis:</span> <span class="value">{{ score.source }}</span></div>
+      <div class="field"><span class="label">Liturginis laikas:</span> <span class="value">{{ score.liturgical_time }}</span></div>
+      <div class="field"><span class="label">Mišių dalis:</span> <span class="value">{{ score.mass_part }}</span></div>
+      <div class="field"><span class="label">Natų rinkinys:</span> <span class="value">{{ score.parent_issue }}</span></div>
+      <div class="field"><span class="label">Žymos:</span> <span class="value">{{ score.tags }}</span></div>
+      <div class="field"><span class="label">Kalba:</span> <span class="value">{{ score.language }}</span></div>
+      <div class="field"><span class="label">Archyvo ID:</span> <span class="value">{{ score.archive_id }}</span></div>
+      <div class="field"><span class="label">Papildoma informacija:</span> <span class="value">{{ score.additional_info }}</span></div>
+      {% if user.role.value == "admin" %}
+        <div class="field"><span class="label">Pateikė:</span> <span class="value">{{ score.submitted_by_username }}</span></div>
+        <div class="field">
+          <span class="label">Būsena:</span>
+          <span class="value">
+            {% if score.status.name == "APPROVED" %}
+              Patvirtinta
+            {% else %}
+              Laukia patvirtinimo
+            {% endif %}
+          </span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- PDFs -->
+  <div class="card">
+    <h2>PDF failai</h2>
+    {% if score.pdfs %}
+      <ul>
+      {% for pdf in score.pdfs %}
+        <li>
+          <a href="/uploads/pdfs/{{ pdf.pdf_path }}" target="_blank">{{ pdf.pdf_path }}</a>
+          <button class="toggle-btn" onclick="togglePreview('pdf{{ loop.index }}')">Peržiūra</button>
+          <div id="pdf{{ loop.index }}" class="preview">
+            <embed src="/uploads/pdfs/{{ pdf.pdf_path }}" type="application/pdf" width="100%" height="400">
+          </div>
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nėra PDF failų.</p>
+    {% endif %}
+  </div>
+
+  <!-- Lyrics -->
+  <div class="card">
+    <h2>Tekstas</h2>
+    {% if score.lyrics %}
+      <ul>
+      {% for lyr in score.lyrics %}
+        <li>
+          <strong>{{ lyr.language }}</strong> — 
+          <a href="/uploads/lyrics/{{ lyr.file_path }}" target="_blank">{{ lyr.file_path }}</a>
+          <button class="toggle-btn" onclick="togglePreview('lyr{{ loop.index }}')">Peržiūra</button>
+          <div id="lyr{{ loop.index }}" class="preview">
+            <iframe src="/uploads/lyrics/{{ lyr.file_path }}" width="100%" height="200"></iframe>
+          </div>
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nėra teksto failų.</p>
+    {% endif %}
+  </div>
+
+  <!-- Related Scores -->
+  <div class="card">
+    <h2>Susijusios natos</h2>
+    {% if score.related_scores %}
+      <ul>
+      {% for rel in score.related_scores %}
+        <li><a href="/scores/{{ rel.id }}">{{ rel.title }}</a></li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>Nėra susijusių natų.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <a href="/" class="back-link">← Atgal į sąrašą</a>
+    {% if user.role.value == "admin"%}
+      <a href="/admin/update/{{ score.id }}">Redaguoti</a>
+    {% endif %}
+  </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function togglePreview(id) {
+    const el = document.getElementById(id);
+    el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
+  }
+</script>
+{% endblock %}
+

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Pridėti kūrinį{% endblock %}
+
+{% block content %}
+  <h1 class="page-title">Naujo kūrinio įkėlimas</h1>
+
+  <form method="post" action="/scores/add" enctype="multipart/form-data" class="form-box">
+    <div class="row">
+      <label>Pavadinimas* <input type="text" name="title" required></label>
+    </div>
+
+    <div class="row"><label>Kompozitorius <input type="text" name="composer"></label></div>
+    <div class="row"><label>Teksto autorius <input type="text" name="lyrics_author"></label></div>
+    <div class="row"><label>Metai (amžius) <input type="text" name="year"></label></div>
+    <div class="row"><label>Balsų skaičius* <input type="number" name="voices" min="1" required></label></div>
+    <div class="row"><label>Šaltinis <input type="text" name="source"></label></div>
+    <div class="row"><label>Liturginis laikas <input type="text" name="liturgical_time"></label></div>
+    <div class="row"><label>Mišių dalis <input type="text" name="mass_part"></label></div>
+    <div class="row"><label>Natų rinkinys <input type="text" name="parent_issue"></label></div>
+    <div class="row"><label>Žymos (atskirti kableliu) <input type="text" name="tags"></label></div>
+    <div class="row"><label>Kalba <input type="text" name="language"></label></div>
+    <div class="row"><label>Archyvo numeris <input type="text" name="archive_id"></label></div>
+    <div class="row">
+      <label>Papildoma informacija<br>
+        <textarea name="additional_info" rows="4" cols="60"></textarea>
+      </label>
+    </div>
+
+    <!-- PDFs -->
+    <fieldset>
+      <legend>PDF failai</legend>
+      <div id="pdf-rows">
+        <div class="row">
+          <input type="file" name="pdf_files" accept="application/pdf">
+          <button type="button" onclick="removeRow(this)">Pašalinti</button>
+        </div>
+      </div>
+      <button type="button" onclick="addPdfRow()">+ Pridėti papildomą pdf failą</button>
+    </fieldset>
+
+    <!-- Lyrics -->
+    <fieldset class="lyrics">
+      <legend>Tekstas</legend>
+      <div id="trans-rows">
+        <div class="row">
+          <input type="text" name="lyrics_languages" placeholder="Kalba (pvz., lt)">
+          <input type="file" name="lyrics_files" accept=".txt,text/plain" onchange="toggleRequired(this)">
+          <button type="button" onclick="removeRow(this)">Pašalinti</button>
+        </div>
+      </div>
+      <button type="button" onclick="addRow()">+ Pridėti papildomą tekstą</button>
+    </fieldset>
+
+    <!-- Related Scores -->
+    <fieldset>
+      <legend>Susiję kūriniai</legend>
+      <input type="text" id="related-search" placeholder="Ieškoti kūrinių...">
+      <div id="search-results"></div>
+      <ul id="selected-related"></ul>
+    </fieldset>
+
+    <div class="row">
+      <input type="submit" value="Pateikti" class="btn-primary">
+      <a href="/" class="btn-cancel">Atšaukti</a>
+    </div>
+  </form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function addRow() {
+    const wrap = document.getElementById('trans-rows');
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input type="text" name="lyrics_languages" placeholder="Kalba (pvz., lt)">
+      <input type="file" name="lyrics_files" accept=".txt,text/plain" onchange="toggleRequired(this)">
+      <button type="button" onclick="removeRow(this)">Pašalinti</button>
+    `;
+    wrap.appendChild(row);
+  }
+
+  function addPdfRow() {
+    const wrap = document.getElementById('pdf-rows');
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <input type="file" name="pdf_files" accept="application/pdf">
+      <button type="button" onclick="removeRow(this)">Pašalinti</button>
+    `;
+    wrap.appendChild(row);
+  }
+
+  function removeRow(btn) {
+    const row = btn.parentElement;
+    row.parentElement.removeChild(row);
+  }
+
+  function toggleRequired(fileInput) {
+    const row = fileInput.closest(".row");
+    const langInput = row.querySelector('input[name="lyrics_languages"]');
+    langInput.required = fileInput.files.length > 0;
+  }
+
+  // Related scores search
+  async function searchScores(query) {
+    if (!query) {
+      document.getElementById("search-results").innerHTML = "";
+      return;
+    }
+    const resp = await fetch(`/scores/search_light?q=${encodeURIComponent(query)}`);
+    const scores = await resp.json();
+    const results = document.getElementById("search-results");
+    results.innerHTML = "";
+    scores.forEach(s => {
+      const div = document.createElement("div");
+      div.textContent = `${s.title}${s.composer ? " — " + s.composer : ""}${s.voices ? " (balsų: " + s.voices + ")" : ""}`;
+      div.style.cursor = "pointer";
+      div.onclick = () => addRelated(s);
+      results.appendChild(div);
+    });
+  }
+
+  function addRelated(score) {
+    const list = document.getElementById("selected-related");
+    const li = document.createElement("li");
+    li.textContent = `${score.title}${score.composer ? " — " + score.composer : ""}${score.voices ? " (balsų: " + score.voices + ")" : ""}`;
+    li.innerHTML += ` <button type="button" onclick="this.parentElement.remove()">Pašalinti</button>`;
+    li.innerHTML += `<input type="hidden" name="related_scores" value="${score.id}">`;
+    list.appendChild(li);
+    document.getElementById("search-results").innerHTML = "";
+    document.getElementById("related-search").value = "";
+  }
+
+  document.getElementById("related-search")
+    .addEventListener("input", e => searchScores(e.target.value));
+</script>
+{% endblock %}
+

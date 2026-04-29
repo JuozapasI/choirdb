@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Psallite{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top panel row -->
+    <div class="top-panel">
+        <h1>Psallite Choro Natos</h1>
+        <nav>
+            {% if user %}
+                <span class="user-info">Vartotojas: {{ user.username }}</span>
+                {% if user.role.value == "admin" and request.url.path != "/admin/"%}
+                    <a href="/admin">Administratorius</a>
+                {% endif %}
+                {% if request.url.path == "/" %}
+                    <a href="/scores/add">Pridėti natas</a>
+                {% endif %}
+                {% if request.url.path != "/" %}
+                    <a href="/">Pradžia</a>
+                {% endif %}
+                <a href="/users/logout">Atsijungti</a>
+            {% else %}
+                {% if request.url.path != "/users/login" %}
+                <a href="/users/login">Prisijungti</a>
+                {% endif %}
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="overlay">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

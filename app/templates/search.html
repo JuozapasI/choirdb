@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Išplėstinė paieška</h1>
+
+<div class="content">
+
+  <!-- Search form -->
+  <div class="card">
+    <h2>Filtrai</h2>
+    <form method="get" action="/scores/search">
+      <div class="fields">
+        <div class="field"><span class="label">Raktinis žodis:</span> <input type="text" name="q" value="{{ request.query_params.get('q', '') }}"></div>
+        <div class="field"><span class="label">Pavadinimas:</span> <input type="text" name="title" value="{{ request.query_params.get('title', '') }}"></div>
+        <div class="field"><span class="label">Kompozitorius:</span> <input type="text" name="composer" value="{{ request.query_params.get('composer', '') }}"></div>
+        <div class="field"><span class="label">Žodžių autorius:</span> <input type="text" name="lyrics_author" value="{{ request.query_params.get('lyrics_author', '') }}"></div>
+        <div class="field"><span class="label">Liturginis laikas:</span>
+          <select name="liturgical_time">
+            <option value="">-- Visi --</option>
+            {% for lt in liturgical_times %}
+              <option value="{{ lt }}" {% if request.query_params.get('liturgical_time') == lt %}selected{% endif %}>{{ lt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field"><span class="label">Mišių dalis:</span>
+          <select name="mass_part">
+            <option value="">-- Visi --</option>
+            {% for mp in mass_parts %}
+              <option value="{{ mp }}" {% if request.query_params.get('mass_part') == mp %}selected{% endif %}>{{ mp }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field"><span class="label">Kalba:</span>
+          <select name="language">
+            <option value="">-- Visos --</option>
+            {% for lang in languages %}
+              <option value="{{ lang }}" {% if request.query_params.get('language') == lang %}selected{% endif %}>{{ lang }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field"><span class="label">Balsų skaičius:</span>
+          nuo <input type="number" name="voices_min" min="1" value="{{ request.query_params.get('voices_min', '') }}" style="width:80px;">
+          iki <input type="number" name="voices_max" min="1" value="{{ request.query_params.get('voices_max', '') }}" style="width:80px;">
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end; margin-top:15px;">
+        <button type="submit">Ieškoti</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Results table -->
+  {% if scores %}
+    <div class="card table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Pavadinimas</th>
+            <th>Kompozitorius</th>
+            <th>Balsų skaičius</th>
+            <th>Kalba</th>
+            <th>Liturginis laikas</th>
+            <th>Mišių dalis</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for score in scores %}
+            <tr onclick="window.location='/scores/{{ score.id }}'">
+              <td>{{ score.title }}</td>
+              <td>{{ score.composer }}</td>
+              <td>{{ score.voices or score.num_voices }}</td>
+              <td>{{ score.language }}</td>
+              <td>{{ score.liturgical_time }}</td>
+              <td>{{ score.mass_part }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% elif request.query_params %}
+    <p>Pagal pasirinktus kriterijus rezultatų nerasta.</p>
+  {% endif %}
+
+</div>
+{% endblock %}
+
